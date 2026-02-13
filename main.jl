@@ -3,8 +3,8 @@
 # using Pkg
 # Pkg.instantiate("ShastryGS")
 
-# include("src/ShastryGS.jl")
-using ShastryGS
+include("src/ShastryGS.jl")
+# using ShastryGS
 using LinearAlgebra
 using ITensors
 
@@ -28,22 +28,24 @@ let
         model = ARGS[11]
     else
         N::Int64 = 6;
-        D::Int64 = 3; 
+        D::Int64 = 4; 
         J1::Float64 = 1.0;
-        J2::Float64 = 3.4;
-        Delta::Float64 = 0;
+        J2::Float64 = 2.4;
+        Delta::Float64 = -0.25;
         hx::Float64 = 0.0;
-        hz::Float64= 0;
+        hz::Float64= 2.;
         Jx::Float64= 1;
         Jy::Float64= 1;
         Jz::Float64= 1;
         model::String="XY"
     end
+    # XY -> XXZ use Delta
+    # XYZ -> XYZ use Jx,Jy,Jz
     
     dbeta::Float64 = 1e-2
     modit::Int64 = 100
     parameters = Dict("D"=>D, "J1"=>J1, "J2"=>J2, "hz"=>hz, "hx"=>hx, "Delta"=>Delta, "N"=>N, "model"=>model,"Jx"=>Jx,"Jy"=>Jy,"Jz"=>Jz, "dbeta"=>dbeta, "modit"=>modit)
-    SU(parameters)
+    ShastryGS.SU(parameters)
 
     
 

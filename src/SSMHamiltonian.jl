@@ -146,7 +146,7 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
             end
 
             setproperty!(gy,gt[f(i),f(j)],tmpgy);
-
+            # Modify in order to implement a site dependent field.m 
             for i1 = 1:4
                 for j1 = 1:4
                     if abs(cin[i1]-cout[j1]) < 1e-9    

@@ -3,13 +3,13 @@
 module ShastryGS
     
     # Dependencies
-    using FileIO
+    # using FileIO
     using JLD2
     using KrylovKit
     using LinearAlgebra
     using ITensors
     using Printf
-    using MAT
+    # using MAT
 
     # functions
     include("structures.jl")

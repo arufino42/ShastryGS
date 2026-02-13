@@ -164,46 +164,44 @@ function SU(parameters)
 
     if model == "XY"
         Delta = parameters["Delta"]
-        file_name_mat = @sprintf "Results/LocalTensors_N%.0f_J1%.2f_J2%.2f_Delta%.2f_D%.0f_hz%.2f_hx%.2f.mat" N J1 J2 Delta D hz hx
-        file = matopen(file_name_mat, "w")
-        write(file, "J1", J1)
-        write(file, "J2", J2)
-        write(file, "hz", hz)
-        write(file, "hx", hx)
-        write(file, "Delta", Delta)
-        write(file, "ener", energie)
-        write(file, "magnex", magnex)
-        write(file, "magney", magney)
-        write(file, "magnez", magnez)
-        write(file, "err", err)
-        write(file, "it", it)
-        write(file, "N", N)
-        write(file, "xi", xi)
-        close(file)
+        file_name_mat = @sprintf "Results/Results_N%.0f_J1%.2f_J2%.2f_Delta%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Delta D hz hx
+        file = save(file_name_mat, 
+         "J1", J1,
+         "J2", J2,
+         "hz", hz,
+         "hx", hx,
+         "Delta", Delta,
+         "ener", energie,
+         "magnex", magnex,
+         "magney", magney,
+         "magnez", magnez,
+         "err", err,
+         "it", it,
+         "N", N,
+         "xi", xi)
 
     elseif model == "XYZ"
         Jx = parameters["Jx"]
         Jy = parameters["Jy"]
         Jz = parameters["Jz"]
-        file_name_mat = @sprintf "Results/LocalTensors_N%.0f_J1%.2f_J2%.2f_Jx%.2f_Jy%.2f_Jz%.2f_D%.0f_hz%.2f_hx%.2f.mat" N J1 J2 Jx Jy Jz D hz hx
-        file = matopen(file_name_mat, "w")
-        write(file, "J1", J1)
-        write(file, "J2", J2)
-        write(file, "hz", hz)
-        write(file, "hx", hx)
-        write(file, "ener", energie)
-        write(file, "magnex", magnex)
-        write(file, "magney", magney)
-        write(file, "magnez", magnez)
-        write(file, "err", err)
-        write(file, "it", it)
-        write(file, "N", N)
-        write(file, "Jx", Jx)
-        write(file, "Jy", Jy)
-        write(file, "Jz", Jz)
-        write(file, "Ps", Ps)
-        write(file, "xi", xi)
-        close(file)
+        file_name_mat = @sprintf "Results/Results_N%.0f_J1%.2f_J2%.2f_Jx%.2f_Jy%.2f_Jz%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Jx Jy Jz D hz hx
+        file = save(file_name_mat,
+         "J1", J1,
+         "J2", J2,
+         "hz", hz,
+         "hx", hx,
+         "ener", energie,
+         "magnex", magnex,
+         "magney", magney,
+         "magnez", magnez,
+         "err", err,
+         "it", it,
+         "N", N,
+         "Jx", Jx,
+         "Jy", Jy,
+         "Jz", Jz,
+         "Ps", Ps,
+         "xi", xi)
     end
    
 

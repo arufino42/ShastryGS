@@ -1,5 +1,6 @@
-
-
-
+# Ignoring results
+/Figures/
+/Results/
+/.vscode/
+*.toml
 /src/other_files/** 
-
