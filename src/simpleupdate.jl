@@ -35,20 +35,20 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
     itctm = 0
     errctm = 0
 
-    while ener < enertmp && abs(ener - enertmp) > 1e-6
+    while ener < enertmp && abs(ener - enertmp)/dbetasu/modit > 1e-6/0.1/300
 
         iter = iter + 1
         Gamma,lambdax,lambday,free_energy = simpleupdateJ1(Gamma,lambdax,lambday,physical_legs,gt,nsu,parameters,free_energy)
-
         if mod(iter,10)==0
+            println("dbetasu=$dbetasu")
+            println("modit=$modit")
             println(iter)
         end
 
         if mod(iter,modit) == 0
-                
             if model=="XY"
 
-                file_name_jld2 = @sprintf "Results/LocalTensors_N%.0f_J1%.2f_J2%.2f_Delta%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Delta D hz hx
+                file_name_jld2 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Delta D hz hx
                 save(file_name_jld2,
                         "D",D,
                         "Delta",delta,
@@ -65,13 +65,11 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
                         "N",N,
                     "gg",gg)
 
-            elseif model=="XYZ"
-
+            elseif model=="XYZ"||model=="XYZ_stagH"
                 Jx = parameters["Jx"]
                 Jy = parameters["Jy"]
                 Jz = parameters["Jz"]
-
-                file_name_jld2 = @sprintf "Results/LocalTensors_N%.0f_J1%.2f_J2%.2f_Jx%.2f_Jy%.2f_Jz%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Jx Jy Jz D hz hx
+                file_name_jld2 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Jx Jy Jz D hz hx
                 save(file_name_jld2,
                         "D",D,
                         "Delta",delta,
@@ -87,10 +85,8 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
                         "gt",gt,
                         "N",N,
                     "gg",gg)
-
             else
-                println("Please choose a valid model, either XY or XYZ")
-                exit()
+                error("Please choose a valid model, either XY, XYZ or XYZ_varH")
             end
             
             chi = D*D + 1; 
@@ -100,7 +96,11 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
         
             C,T = OBC_PEPS(tens_A,cxd,cyd,gt,N)
             C, T, itctm, errctm = ctm!(tens_a,tens_A,cxd,cyd,gt,physical_legs,chi,precision_ctm,C,T,N) 
-
+            @show errctm
+            if errctm>2*precision_ctm
+                @warn "CTM didn't converge!"
+                continue;
+            end
             enertmp = ener
             ener, mmx, mmy, mmz, Ps = energy(C,T,tens_a,tens_A,gt,cxd,cyd,physical_legs,parameters)
             ener = real(ener)
@@ -118,6 +118,7 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
             @show push!(magney, sum_magney)
             @show push!(magnez, sum_magnez)
             @show push!(energie, real(ener))
+            @show diff(energie)
         
         end
 
@@ -164,12 +165,14 @@ function SU(parameters)
 
     if model == "XY"
         Delta = parameters["Delta"]
-        file_name_mat = @sprintf "Results/Results_N%.0f_J1%.2f_J2%.2f_Delta%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Delta D hz hx
+        file_name_mat = @sprintf "Results/Results_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Delta D hz hx
         file = save(file_name_mat, 
          "J1", J1,
          "J2", J2,
          "hz", hz,
          "hx", hx,
+         "D",D,
+         "model",model,
          "Delta", Delta,
          "ener", energie,
          "magnex", magnex,
@@ -184,12 +187,14 @@ function SU(parameters)
         Jx = parameters["Jx"]
         Jy = parameters["Jy"]
         Jz = parameters["Jz"]
-        file_name_mat = @sprintf "Results/Results_N%.0f_J1%.2f_J2%.2f_Jx%.2f_Jy%.2f_Jz%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Jx Jy Jz D hz hx
+        file_name_mat = @sprintf "Results/Results_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Jx Jy Jz D hz hx
         file = save(file_name_mat,
          "J1", J1,
          "J2", J2,
          "hz", hz,
          "hx", hx,
+         "D",D,
+         "model",model,
          "ener", energie,
          "magnex", magnex,
          "magney", magney,

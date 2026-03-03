@@ -5,10 +5,10 @@
 #SBATCH --nodes 1
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 1
-#SBATCH --time 03:00:00
+#SBATCH --time 24:00:00
 #SBATCH --mem 6G
 
-export SCR=/scratch/afdossan/
+export SCR=/scratch/afdossan
 export DAT=/home/afdossan/Samuel_SSL_IPEPS
 export RES=/home/afdossan/Samuel_SSL_IPEPS/Results
 
@@ -25,32 +25,31 @@ module load gcc julia
 
 echo STARTING AT `date`
 
-D="3"
-# hz="${h_val}"
-hz="1.00"
-hx="0.00"
-Delta="2.00"
-J1="1.00"
-J2="2.40"
-N="6"
-Jx="1.00"
-Jy="1.00"
-Jz="0.00"
-model="XYZ"
+D=${D:-3}
+multiD=${multiD:-0}
+hz=${hz:-1.00}
+hx=${hx:-0.00}
+Delta=${Delta:-0.25}
+J1=${J1:-1.00}
+J2=${J2:-2.40}
+N=${N:-6}
+Jx=${Jx:-0.25}
+Jy=${Jy:-0.50}
+Jz=${Jz:-1.00}
+model=${model:-XYZ}
+echo "D=$D"
+echo "multiD=$multiD"
 
-julia --project=. -t 1 main.jl "$D" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$model"
+for curD in $(seq $D 1 $(echo "$D+$multiD"|bc)); do
+    echo "Running with parameters:"
+    echo "D=$curD J1=$J1 J2=$J2 Delta=$Delta hx=$hx hz=$hz N=$N"
+    echo "Jx=$Jx Jy=$Jy Jz=$Jz model=$model"
+    julia --project=. -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$model"
+    mkdir -p $RES
+    cp $SCR/$SLURM_JOB_ID/Results/* $RES
+done
 
 echo FINISHED at `date`
-
-mkdir -p $RES
-if [ "$model" == "XY" ]; then
-    cp -r $SCR/$SLURM_JOB_ID/Results/LocalTensors_N${N}_J1${J1}_J2${J2}_Delta${Delta}_D${D}_hz${hz}_hx${hx}.jld2 $DAT/Results
-    cp -r $SCR/$SLURM_JOB_ID/Results/LocalTensors_N${N}_J1${J1}_J2${J2}_Delta${Delta}_D${D}_hz${hz}_hx${hx}.mat $DAT/Results
-else
-    cp -r $SCR/$SLURM_JOB_ID/Results/LocalTensors_N${N}_J1${J1}_J2${J2}_Jx${Jx}_Jy${Jy}_Jz${Jz}_D${D}_hz${hz}_hx${hx}.jld2 $DAT/Results
-    cp -r $SCR/$SLURM_JOB_ID/Results/LocalTensors_N${N}_J1${J1}_J2${J2}_Jx${Jx}_Jy${Jy}_Jz${Jz}_D${D}_hz${hz}_hx${hx}.mat $DAT/Results
-fi
-
 
 echo " ***** END OF JOB ***** "
 

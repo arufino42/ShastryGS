@@ -71,28 +71,30 @@ function initialisation(parameters::Dict)
     Delta = parameters["Delta"]
     N = parameters["N"]
     model = parameters["model"]
-
+    
     if model=="XY"
-        file_name_jld2_D = @sprintf "Results/LocalTensors_N%.0f_J1%.2f_J2%.2f_Delta%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Delta D hz hx
-        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N%.0f_J1%.2f_J2%.2f_Delta%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Delta D-1 hz hx
+        file_name_jld2_D = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Delta D hz hx
+        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Delta D-1 hz hx
     elseif model=="XYZ"
         Jx = parameters["Jx"]
         Jy = parameters["Jy"]
         Jz = parameters["Jz"]
-        file_name_jld2_D = @sprintf "Results/LocalTensors_N%.0f_J1%.2f_J2%.2f_Jx%.2f_Jy%.2f_Jz%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Jx Jy Jz D hz hx
-        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N%.0f_J1%.2f_J2%.2f_Jx%.2f_Jy%.2f_Jz%.2f_D%.0f_hz%.2f_hx%.2f.jld2" N J1 J2 Jx Jy Jz D-1 hz hx
+        file_name_jld2_D = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Jx Jy Jz D hz hx
+        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Jx Jy Jz D-1 hz hx
+    elseif model=="XYZ_varH"
+
     else
         println("please choose a valid model, either XY or XYZ")
         exit()
     end
 
 
-    if isfile(file_name_jld2_D)
+    if isfile(file_name_jld2_D) && (!haskey(parameters,"load") || parameters["load"])
 
         println("LOADING :"*file_name_jld2_D)
         Gamma,lambdax,lambday,physical_legs,gt,gg = load(file_name_jld2_D,"Gamma","lambdax","lambday","physical_legs","gt","gg")
 
-    elseif isfile(file_name_jld2_Dm1)
+    elseif isfile(file_name_jld2_Dm1) && (!haskey(parameters,"load") || parameters["load"])
         
         println("LOADING :"*file_name_jld2_Dm1)
         Gamma,lambdax,lambday,physical_legs,gt,gg = load(file_name_jld2_Dm1,"Gamma","lambdax","lambday","physical_legs","gt","gg")

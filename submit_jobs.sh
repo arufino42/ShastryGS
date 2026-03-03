@@ -1,18 +1,8 @@
 #!/bin/bash
-h_values=()
-for h in $(seq 0.0 0.1 5); do
-   formatted_h=$(printf "%.2f" "$h")
-   h_values+=("$formatted_h")
-done
-
-# Loop over each h value
-for h in "${h_values[@]}"; do
-    # Create a unique job script for each h value
-    job_file="SMM_h_${h}.run"
-    sed "s/\${h_val}/$h/g" SSM.run > "$job_file"
-
+# In order to change parameters, use --export=param1=val1,param2=val2,...
+# Parameter multiD used for running several values of D sequentially
+for h in $(seq -f "%2.2f" 0.5 0.02 2.0); do
     # Submit the job
-    sbatch -A ctmc "$job_file"
-
+    sbatch -A ctmc --export=hz=$h,D=2,multiD=0,Jx=1.4,Jy=0.6,Jz=0. SSM.run
     echo "Submitted job for h=$h"
 done
