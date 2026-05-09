@@ -36,6 +36,8 @@ N=${N:-6}
 Jx=${Jx:-0.25}
 Jy=${Jy:-0.50}
 Jz=${Jz:-1.00}
+Delta1=${Delta1:-0.}
+Delta2=${Delta2:-0.}
 model=${model:-XYZ}
 echo "D=$D"
 echo "multiD=$multiD"
@@ -43,8 +45,12 @@ echo "multiD=$multiD"
 for curD in $(seq $D 1 $(echo "$D+$multiD"|bc)); do
     echo "Running with parameters:"
     echo "D=$curD J1=$J1 J2=$J2 Delta=$Delta hx=$hx hz=$hz N=$N"
-    echo "Jx=$Jx Jy=$Jy Jz=$Jz model=$model"
-    julia --project=. -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$model"
+    echo "Jx=$Jx Jy=$Jy Jz=$Jz Delta1=$Delta1 Delta2=$Delta2 model=$model"
+    if [ $D -eq 2 ]; then
+        julia --project=. -O0 -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$Delta1" "$Delta2" "$model"
+    else
+        julia --project=. -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$Delta1" "$Delta2" "$model"
+    fi
     mkdir -p $RES
     cp $SCR/$SLURM_JOB_ID/Results/* $RES
 done

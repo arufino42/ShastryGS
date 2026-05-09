@@ -47,7 +47,18 @@ function vertical_correlation(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,
             ss_xyz = Jx*kron(kron(sx,id),kron(sx,id)) + Jy*kron(kron(sy,id),kron(sy,id)) + Jz*kron(kron(sz,id),kron(sz,id)) + 
             Jx*kron(kron(sx,id),kron(id,sx)) + Jy*kron(kron(sy,id),kron(id,sy)) + Jz*kron(kron(sz,id),kron(id,sz))
         end
+    elseif model=="XYZ_stagH"
+        Delta = parameters["Delta1"]
 
+        if mod(i+j,2) == 0 # pair -> up # 14 24
+            ss_xyz = Delta*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz)) + 
+                    Delta*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))
+        end
+
+        if mod(i+j,2) == 1 # impair -> down
+            ss_xyz = Delta*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id)) + 
+                    Delta*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))
+        end
     end
     # ss_xyz = reshape(ss_xyz,(4,4,4,4))
 

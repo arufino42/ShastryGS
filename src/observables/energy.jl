@@ -15,7 +15,7 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
     J2 = parameters["J2"]
     N = parameters["N"]
     model = parameters["model"]
-
+    
     for i = 1:N
         for j = 1:1
             horizontal = horizontal_correlation(C,T,tens_a,tens_A,gt,cxd,cyd,physical_legs,i,j,parameters)
@@ -23,6 +23,11 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
             ener_link = ener_link + horizontal + vertical             
         end 
     end 
+    # Obs1: J2 correlation
+    # Obs2: x magnetization
+    # Obs3: y magnetization
+    # Obs4: z magnetization
+    # Obs5: staggered magnetization
 
     obs1::Matrix{ComplexF64} = zeros(ComplexF64, 4, 4)
     if model=="XY"
@@ -32,12 +37,14 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
         Jy = parameters["Jy"]
         Jz = parameters["Jz"]
         obs1 = Jz*kron(sz,sz) + Jx*kron(sx,sx) + Jy*kron(sy,sy) 
+    elseif model=="XYZ_stagH"
+        Delta2 = parameters["Delta2"]
+        obs1 = kron(sz,sz) + Delta2 * ( kron(sx,sx) + kron(sy,sy) ) 
     end
-
     obs2::Matrix{ComplexF64} =  kron(sz,id) + kron(id,sz);
-    # obs2::Matrix{ComplexF64} =  kron(id,sy) #+ kron(id,id);
     obs3::Matrix{ComplexF64} =  kron(sx,id) + kron(id,sx);
     obs4::Matrix{ComplexF64} =  kron(sy,id) + kron(id,sy);
+    obs5::Matrix{ComplexF64} =  kron(sz,id) - kron(id,sz);
 
     Ps::Matrix{ComplexF64} = 1/2*[0 0 0 0; 0 1 -1 0; 0 -1 1 0; 0 0 0 0]
     Pt1::Matrix{ComplexF64} = 1/2*[1 0 0 -1; 0 0 0 0; 0 0 0 0; -1 0 0 1]
@@ -47,10 +54,12 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
     expect_obs1 = 0
     expect_obs2 = 0
     expect_obs3 = 0
+    expect_obs5 = 0
 
     mmx = []
     mmy = []
     mmz = []
+    mmz_stag = []
     mPs = []
     mPt1 = []
     mPt2 = []
@@ -70,9 +79,14 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
 
             tmp4 = local_obs(C,T,tens_a,tens_A,cxd,cyd,gt,physical_legs,i,j,obs4)
 
+            tmp5 = local_obs(C,T,tens_a,tens_A,cxd,cyd,gt,physical_legs,i,j,obs5)
+            expect_obs5 = expect_obs5 + tmp5
+            
+
             push!(mmz,tmp2)
             push!(mmx,tmp3)
             push!(mmy,tmp4)
+            push!(mmz_stag,tmp5)
 
 
             push!(mPs, local_obs(C,T,tens_a,tens_A,cxd,cyd,gt,physical_legs,i,j,Ps))
@@ -86,15 +100,19 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
     @show mmx
     @show mmy
     @show mmz
+    @show mmz_stag
 
     @show real(mPs)
     @show real(mPt1)
     @show real(mPt2)
     @show real(mPt3)
     Pst = Dict("mpS"=>real(mPs), "mPt1"=>real(mPt1), "mPt2"=>real(mPt2), "mPt3"=>real(mPt3))
+    if model=="XYZ_stagH"
+        energie = real(J1*ener_link + J2*expect_obs1 - hz*expect_obs5)/(N)
+    else
+        energie = real(J1*ener_link + J2*expect_obs1 - hz*expect_obs2 - hx*expect_obs3)/(N)
+    end
 
-    energie = real(J1*ener_link + J2*expect_obs1 - hz*expect_obs2 - hx*expect_obs3)/(N)
-
-    return energie, mmx, mmy, mmz, Pst
+    return energie, mmx, mmy, mmz,mmz_stag, Pst
 
 end

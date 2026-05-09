@@ -37,6 +37,17 @@ function horizontal_correlation(C,T,tens_a,tens_A,gt,cx,cy,
             ss_xyz = Jx*kron(kron(id,sx),kron(sx,id)) + Jy*kron(kron(id,sy),kron(sy,id)) + Jz*kron(kron(id,sz),kron(sz,id)) +
             Jx*kron(kron(id,sx),kron(id,sx)) + Jy*kron(kron(id,sy),kron(id,sy)) + Jz*kron(kron(id,sz),kron(id,sz));
         end
+    elseif model=="XYZ_stagH"
+        Delta=parameters["Delta1"]
+        if abs(mod(i+j,2) - 0) < 1e-9 #pair
+            ss_xyz = Delta*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id)) + 
+            Delta*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id)) 
+        end
+
+        if abs(mod(i+j,2) - 1) < 1e-9 # impair
+            ss_xyz = Delta*(kron(kron(id,sx),kron(sx,id)) -  kron(kron(id,sy),kron(sy,id))) +  kron(kron(id,sz),kron(sz,id)) +
+            Delta*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz));
+        end
     end
 
     ss_xyz = reshape(ss_xyz,(4,4,4,4))

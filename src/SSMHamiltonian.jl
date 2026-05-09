@@ -6,7 +6,7 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
         Gives back the trotter gates for the models. 
             gx: trotter gates defined in the x-direction 
             gy: trotter gates defined in the y-direction 
-            gmu: trotter gates defined on a single site. 
+            mu: trotter gates defined on a single site. 
 
         ARGS: 
             parameters: the parameters of the model 
@@ -59,7 +59,6 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
         gd = reshape(e4, (4,4,4,4)); # 21 43 21 43
 
     elseif model=="XYZ"
-
         Jx = parameters["Jx"]
         Jy = parameters["Jy"]
         Jz = parameters["Jz"]
@@ -87,12 +86,38 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
             J1*( Jx*kron(kron(sx,id),kron(id,sx)) + Jy*kron(kron(sy,id),kron(id,sy)) + Jz*kron(kron(sz,id),kron(id,sz))) 
         e4 = exp(-h4/nsu);
         gd = reshape(e4, (4,4,4,4)); # 21 43 21 43
+    elseif model=="XYZ_stagH"
+        Delta1 = parameters["Delta1"]
+        Delta2 = parameters["Delta2"]
+        
+        h2 = J2*(kron(sz,sz) + Delta2*(kron(sx,sx) + kron(sy,sy))) - hz*kron(sz,id) + hz*kron(id,sz);
+        e2 = exp(-h2/nsu);
+        gin = reshape(e2 ,(4, 4)); 
+
+        h1 = J1*( Delta1*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id))) + 
+            J1*( Delta1*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id))) 
+        e1 = exp(-h1/nsu);
+        gr = reshape(e1, (4,4,4,4));  # 21 43 21 43
+
+        h2 = J1*(Delta1*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id))) + 
+            J1*(Delta1*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))) 
+        e2 = exp(-h2/nsu);
+        gl = reshape(e2, (4,4,4,4)); # 21 43 21 43
+    
+        h3 = J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))) + 
+            J1*(Delta1*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))) 
+        e3 = exp(-h3/nsu);
+        gu = reshape(e3, (4,4,4,4)); # 21 43 21 43
+
+        h4 = J1*(Delta1*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id))) + 
+            J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))) 
+        e4 = exp(-h4/nsu);
+        gd = reshape(e4, (4,4,4,4)); # 21 43 21 43
 
     end
 
     for i = 1:1:N
         for j = 1:1:1
-
             ia = getfield(physical_legs,gt[f(i),f(j)]);
             ib = getfield(physical_legs,gt[f(i+1),f(j)]);
             ic = getfield(physical_legs,gt[f(i),f(j+1)]);

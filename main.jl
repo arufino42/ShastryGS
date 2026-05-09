@@ -25,23 +25,27 @@ let
         Jx = parse(Float64, ARGS[8])
         Jy = parse(Float64, ARGS[9])
         Jz = parse(Float64, ARGS[10])
-        model = ARGS[11]
+        Delta1=parse(Float64,ARGS[11])
+        Delta2=parse(Float64,ARGS[12])
+        model = ARGS[13]
     else
         N::Int64 = 6;
-        D::Int64 = 3; 
-        J1::Float64 = 1.0;
-        J2::Float64 = 2.4;
+        D::Int64 = 3;
+        J1::Float64 = 3.;
+        J2::Float64 = 3.;
         Delta::Float64 = -0.25;
         hx::Float64 = 0.0;
-        hz::Float64= 1.3;
-        Jx::Float64= 1.;
-        Jy::Float64= 1.;
+        hz::Float64= 1.6;
+        Jx::Float64= 1.4;
+        Jy::Float64= 0.6;
         Jz::Float64= 0.;
-        model::String="XYZ"
+        Delta1::Float64= 0.0;
+        Delta2::Float64= 0.8;
+        model::String="XYZ_stagH"
     end
     # XY -> XXZ use Delta
     # XYZ -> XYZ use Jx,Jy,Jz
-    # XYZ_stagH -> XYZ with staggered field, use Jx,Jy,Jz
+    # XYZ_stagH -> XYZ with staggered field, use Delta1,Delta2
     if D ==2
         dbeta = 1e-1
     elseif D==3
@@ -50,9 +54,6 @@ let
         dbeta = 1e-3
     end
     modit::Int64 = 300
-    parameters = Dict("D"=>D, "J1"=>J1, "J2"=>J2, "hz"=>hz, "hx"=>hx, "Delta"=>Delta, "N"=>N, "model"=>model,"Jx"=>Jx,"Jy"=>Jy,"Jz"=>Jz, "dbeta"=>dbeta, "modit"=>modit,"load"=>true)
+    parameters = Dict("D"=>D, "J1"=>J1, "J2"=>J2, "hz"=>hz, "hx"=>hx, "Delta"=>Delta, "N"=>N, "model"=>model,"Jx"=>Jx,"Jy"=>Jy,"Jz"=>Jz, "Delta1"=>Delta1, "Delta2"=>Delta2, "dbeta"=>dbeta, "modit"=>modit,"load"=>true)
     ShastryGS.SU(parameters)
 end
-
-
-
