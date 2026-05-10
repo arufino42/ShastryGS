@@ -31,7 +31,6 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
     f(x) = mod(x-1,N) + 1;
 
     sx = 1/2*[0 1; 1 0]; sy = 1/2*[0 -1im; 1im 0]; sz = 1/2*[1 0; 0 -1]; id = [1 0; 0 1];
-    
     if model=="XY"
 
         h2 = J2*(kron(sz,sz) + Delta*(kron(sx,sx) + kron(sy,sy))) - hz*kron(sz,id) - hz*kron(id,sz) - hx*kron(sx,id) - hx*kron(id,sx);
@@ -89,14 +88,7 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
     elseif model=="XYZ_stagH"
         Delta1 = parameters["Delta1"]
         Delta2 = parameters["Delta2"]
-        eta=parameters["eta"]
-        H_dir=parameters["H_dir"]
-        h_dir=parse.(Int,collect(H_dir))
-        h_dir=h_dir/norm(h_dir)
-        # Need to multiply by 2 due to using spin 1/2 operators
-        h_list=2*hz*(6.32 * h_dir[1]* [1, 1, -1, -1.] + 6.32 * h_dir[2]* [1, -1, -1, 1.] + 1.28 * h_dir[3]* [1, 1, 1, 1.])
-        @show h_list
-        error("stop")
+        
 
         
         h2 = J2*(kron(sz,sz) + Delta2*(kron(sx,sx) + kron(sy,sy))) - hz*kron(sz,id) + hz*kron(id,sz);
@@ -126,9 +118,54 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
         Delta1 = parameters["Delta1"]
         Delta2 = parameters["Delta2"]
         eta = parameters["eta"]
+        H_dir=parameters["H_dir"]
+        
+        if H_dir=="100"
+            h_ren=2*6.32*hz
+
+            h2 = J2*(kron(sz,sz) + Delta2*(kron(sx,sx) + kron(sy,sy))) - h_ren*kron(sz,id) + h_ren*kron(id,sz);
+            e2 = exp(-h2/nsu);
+            gin_even = reshape(e2 ,(4, 4)); 
+            gin_odd = reshape(e2 ,(4, 4)); 
+
+        elseif H_dir=="110"
+            h_ren=2*8.93*hz
+
+            h2 = J2*(kron(sz,sz) + Delta2*(kron(sx,sx) + kron(sy,sy))) - h_ren*kron(sz,id) + h_ren*kron(id,sz);
+            e2 = exp(-h2/nsu);
+            gin_even = reshape(e2 ,(4, 4)); 
+            h2 = J2*(kron(sz,sz) + Delta2*(kron(sx,sx) + kron(sy,sy)))
+            e2 = exp(-h2/nsu);
+            gin_odd = reshape(e2 ,(4, 4)); 
+        elseif H_dir=="001"
+            h_ren=2*1.28*hz
+
+            h2 = J2*(kron(sz,sz) + Delta2*(kron(sx,sx) + kron(sy,sy))) - h_ren*kron(sz,id) - h_ren*kron(id,sz);
+            e2 = exp(-h2/nsu);
+            gin_even = reshape(e2 ,(4, 4)); 
+            gin_odd = reshape(e2 ,(4, 4)); 
+        end
+        h1 = J1*( Delta1*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id))) + 
+            J1*( Delta1*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id))) 
+        e1 = exp(-h1/nsu);
+        gr = reshape(e1, (4,4,4,4));  # 21 43 21 43
+
+        h2 = J1*(Delta1*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id))) + 
+            J1*(Delta1*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))) 
+        e2 = exp(-h2/nsu);
+        gl = reshape(e2, (4,4,4,4)); # 21 43 21 43
+    
+        h3 = J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))) + 
+            J1*(Delta1*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))) 
+        e3 = exp(-h3/nsu);
+        gu = reshape(e3, (4,4,4,4)); # 21 43 21 43
+
+        h4 = J1*(Delta1*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id))) + 
+            J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))) 
+        e4 = exp(-h4/nsu);
+        gd = reshape(e4, (4,4,4,4)); # 21 43 21 43
         
     end
-
     for i = 1:1:N
         for j = 1:1:1
             ia = getfield(physical_legs,gt[f(i),f(j)]);
@@ -185,10 +222,18 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
 
             setproperty!(gy,gt[f(i),f(j)],tmpgy);
             # Modify in order to implement a site dependent field.m 
+            # i and j are the two indices hitting on the same site
             for i1 = 1:4
                 for j1 = 1:4
-                    if abs(cin[i1]-cout[j1]) < 1e-9    
-                    tmpmu[dag(ia)=>i1,ia'=>j1] = gin[i1,j1];
+                    if model=="Tb_SSL"
+                        if abs(mod(i+j,2) - 0) < 1e-9 # pair
+                            tmpmu[dag(ia)=>i1,ia'=>j1] = gin_even[i1,j1];
+                        end
+                        if abs(mod(i+j,2)-1) < 1e-9 # impair
+                            tmpmu[dag(ia)=>i1,ia'=>j1] = gin_odd[i1,j1];
+                        end
+                    else
+                        tmpmu[dag(ia)=>i1,ia'=>j1] = gin[i1,j1];
                     end
                 end
             end

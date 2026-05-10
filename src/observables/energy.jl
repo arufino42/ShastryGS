@@ -15,7 +15,7 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
     J2 = parameters["J2"]
     N = parameters["N"]
     model = parameters["model"]
-    
+    H_dir = parameters["H_dir"]
     for i = 1:N
         for j = 1:1
             horizontal = horizontal_correlation(C,T,tens_a,tens_A,gt,cxd,cyd,physical_legs,i,j,parameters)
@@ -79,14 +79,22 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
 
             tmp4 = local_obs(C,T,tens_a,tens_A,cxd,cyd,gt,physical_legs,i,j,obs4)
 
-            tmp5 = local_obs(C,T,tens_a,tens_A,cxd,cyd,gt,physical_legs,i,j,obs5)
-            expect_obs5 = expect_obs5 + tmp5
+            if model=="Tb_SSL" && H_dir=="110"
+                if abs(mod(i+j,2) - 0) < 1e-9 # pair
+                    tmp5 = local_obs(C,T,tens_a,tens_A,cxd,cyd,gt,physical_legs,i,j,obs5)
+                    expect_obs5 = expect_obs5 + tmp5
+                    push!(mmz_stag,tmp5)
+                end
+            else
+                tmp5 = local_obs(C,T,tens_a,tens_A,cxd,cyd,gt,physical_legs,i,j,obs5)
+                expect_obs5 = expect_obs5 + tmp5
+                push!(mmz_stag,tmp5)
+            end
             
 
             push!(mmz,tmp2)
             push!(mmx,tmp3)
             push!(mmy,tmp4)
-            push!(mmz_stag,tmp5)
 
 
             push!(mPs, local_obs(C,T,tens_a,tens_A,cxd,cyd,gt,physical_legs,i,j,Ps))
@@ -109,6 +117,17 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
     Pst = Dict("mpS"=>real(mPs), "mPt1"=>real(mPt1), "mPt2"=>real(mPt2), "mPt3"=>real(mPt3))
     if model=="XYZ_stagH"
         energie = real(J1*ener_link + J2*expect_obs1 - hz*expect_obs5)/(N)
+    elseif model=="Tb_SSL"
+        if H_dir=="001"
+            h_ren=2*1.28
+            energie = real(J1*ener_link + J2*expect_obs1 - h_ren*expect_obs2)/(N)
+        elseif H_dir=="100"
+            h_ren=2*6.32
+            energie = real(J1*ener_link + J2*expect_obs1 - h_ren*expect_obs5)/(N)
+        elseif H_dir=="110"
+            h_ren=2*8.93
+            energie =real(J1*ener_link + J2*expect_obs1 - h_ren*expect_obs5)/(N)
+        end
     else
         energie = real(J1*ener_link + J2*expect_obs1 - hz*expect_obs2 - hx*expect_obs3)/(N)
     end

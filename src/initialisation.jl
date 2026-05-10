@@ -86,9 +86,15 @@ function initialisation(parameters::Dict)
         Delta2 = parameters["Delta2"]
         file_name_jld2_D = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 D hz model
         file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 D-1 hz model
+    elseif model=="Tb_SSL"
+        Delta1 = parameters["Delta1"]
+        Delta2 = parameters["Delta2"]
+        eta = parameters["eta"]
+        H_dir = parameters["H_dir"]
+        file_name_jld2_D = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 eta H_dir D hz model
+        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 eta H_dir D-1 hz model
     else
-        println("please choose a valid model, either XY, XYZ or XYZ_stagH")
-        exit()
+        error("please choose a valid model, either XY, XYZ, XYZ_stagH or Tb_SSL.")
     end
 
 

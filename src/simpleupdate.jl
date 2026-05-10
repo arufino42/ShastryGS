@@ -91,12 +91,35 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
                 file_name_jld2 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 D hz model
                 save(file_name_jld2,
                         "D",D,
-                        "Delta",delta,
+                        "Delta1",Delta1,
+                        "Delta2",Delta2,
                         "J1",J1,
                         "J2",J2,
                         "nsu",nsu,
                         "hz",hz,
-                        "hx",hx,
+                        "Gamma",Gamma,
+                        "lambdax",lambdax,
+                        "lambday",lambday,
+                        "physical_legs",physical_legs,
+                        "gt",gt,
+                        "N",N,
+                    "gg",gg)
+            elseif model=="Tb_SSL"
+                Delta1=parameters["Delta1"]
+                Delta2=parameters["Delta2"]
+                eta=parameters["eta"]
+                H_dir=parameters["H_dir"]
+                file_name_jld2 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 eta H_dir D hz model
+                save(file_name_jld2,
+                        "D",D,
+                        "Delta1",Delta1,
+                        "Delta2",Delta2,
+                        "eta",eta,
+                        "H_dir",H_dir,
+                        "J1",J1,
+                        "J2",J2,
+                        "nsu",nsu,
+                        "hz",hz,
                         "Gamma",Gamma,
                         "lambdax",lambdax,
                         "lambday",lambday,
@@ -134,7 +157,17 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
             sum_magnex = sum(mmx)
             sum_magney = sum(mmy)
             sum_magnez = sum(mmz)
-            sum_magnez_stag = sum(mmz_stag)
+            if parameters["model"]=="Tb_SSL"
+                if parameters["H_dir"]=="100"
+                    sum_magnez_stag = sum(mmz_stag)*2*6.32
+                elseif parameters["H_dir"]=="110"
+                    sum_magnez_stag = sum(mmz_stag)*2*8.93
+                elseif parameters["H_dir"]=="001"
+                    sum_magnez_stag = sum(mmz)*2*1.28
+                end
+            else
+                sum_magnez_stag = sum(mmz_stag)
+            end
 
             @show push!(magnex, sum_magnex)
             @show push!(magney, sum_magney)
@@ -252,6 +285,32 @@ function SU(parameters)
          "N", N,
          "Delta1", Delta1,
          "Delta2", Delta2,
+         "Ps", Ps,
+         "xi", xi)
+    elseif model=="Tb_SSL"
+        Delta1 = parameters["Delta1"]
+        Delta2 = parameters["Delta2"]
+        eta = parameters["eta"]
+        H_dir = parameters["H_dir"]
+        file_name_mat = @sprintf "Results/Results_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 eta H_dir D hz model
+        file = save(file_name_mat,
+         "J1", J1,
+         "J2", J2,
+         "hz", hz,
+         "D",D,
+         "model",model,
+         "ener", energie,
+         "magnex", magnex,
+         "magney", magney,
+         "magnez", magnez,
+         "magnez_stag", magnez_stag,
+         "err", err,
+         "it", it,
+         "N", N,
+         "Delta1", Delta1,
+         "Delta2", Delta2,
+         "eta", eta,
+         "H_dir", H_dir,
          "Ps", Ps,
          "xi", xi)
     end

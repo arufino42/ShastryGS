@@ -41,11 +41,11 @@ let
         Jx::Float64= 1.4;
         Jy::Float64= 0.6;
         Jz::Float64= 0.;
-        Delta1::Float64= 0.0;
-        Delta2::Float64= 0.2;
+        Delta1::Float64= 1.0;
+        Delta2::Float64= 0.5;
         eta=0.0;
-        H_dir="001";
-        model::String="XYZ_stagH"
+        H_dir="110";
+        model::String="Tb_SSL"
     end
     # XY -> XXZ use Delta
     # XYZ -> XYZ use Jx,Jy,Jz
