@@ -5,8 +5,12 @@
 #SBATCH --nodes 1
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 1
-#SBATCH --time 24:00:00
+#SBATCH --time 04:00:00
 #SBATCH --mem 6G
+#SBATCH --output=logs/%A_%a.out
+#SBATCH --error=logs/%A_%a.err
+#SBATCH --array=1-201
+
 
 export SCR=/scratch/afdossan
 export DAT=/home/afdossan/Samuel_SSL_IPEPS
@@ -25,20 +29,27 @@ module load gcc julia
 
 echo STARTING AT `date`
 
-D=${D:-3}
+D=${D:-2}
 multiD=${multiD:-0}
-hz=${hz:-1.00}
+
+
+hmin=${hmin:-0.0}
+hmax=${hmax:-3.0}
+
 hx=${hx:-0.00}
 Delta=${Delta:-0.25}
-J1=${J1:-1.00}
-J2=${J2:-2.40}
+J1=${J1:-3.2}
+J2=${J2:--10.6}
 N=${N:-6}
 Jx=${Jx:-0.25}
 Jy=${Jy:-0.50}
 Jz=${Jz:-1.00}
-Delta1=${Delta1:-0.}
-Delta2=${Delta2:-0.}
-model=${model:-XYZ}
+Delta1=${Delta1:-1.0}
+Delta2=${Delta2:-0.5}
+model=${model:-XYZ_stagH}
+
+H_norm=$(echo "scale=3;$hmin + ($hmax-$hmin)*($SLURM_ARRAY_TASK_ID-1)/($SLURM_ARRAY_TASK_COUNT-1)" | bc -l)
+hz=$(echo "scale=3;$H_norm*2*6.32 " | bc -l)
 echo "D=$D"
 echo "multiD=$multiD"
 
@@ -46,11 +57,7 @@ for curD in $(seq $D 1 $(echo "$D+$multiD"|bc)); do
     echo "Running with parameters:"
     echo "D=$curD J1=$J1 J2=$J2 Delta=$Delta hx=$hx hz=$hz N=$N"
     echo "Jx=$Jx Jy=$Jy Jz=$Jz Delta1=$Delta1 Delta2=$Delta2 model=$model"
-    if [ $D -eq 2 ]; then
-        julia --project=. -O0 -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$Delta1" "$Delta2" "$model"
-    else
-        julia --project=. -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$Delta1" "$Delta2" "$model"
-    fi
+    julia --project=. -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$Delta1" "$Delta2" "$model"
     mkdir -p $RES
     cp $SCR/$SLURM_JOB_ID/Results/* $RES
 done

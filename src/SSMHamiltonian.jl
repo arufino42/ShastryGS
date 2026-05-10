@@ -89,6 +89,15 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
     elseif model=="XYZ_stagH"
         Delta1 = parameters["Delta1"]
         Delta2 = parameters["Delta2"]
+        eta=parameters["eta"]
+        H_dir=parameters["H_dir"]
+        h_dir=parse.(Int,collect(H_dir))
+        h_dir=h_dir/norm(h_dir)
+        # Need to multiply by 2 due to using spin 1/2 operators
+        h_list=2*hz*(6.32 * h_dir[1]* [1, 1, -1, -1.] + 6.32 * h_dir[2]* [1, -1, -1, 1.] + 1.28 * h_dir[3]* [1, 1, 1, 1.])
+        @show h_list
+        error("stop")
+
         
         h2 = J2*(kron(sz,sz) + Delta2*(kron(sx,sx) + kron(sy,sy))) - hz*kron(sz,id) + hz*kron(id,sz);
         e2 = exp(-h2/nsu);
@@ -113,7 +122,11 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
             J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))) 
         e4 = exp(-h4/nsu);
         gd = reshape(e4, (4,4,4,4)); # 21 43 21 43
-
+    elseif model=="Tb_SSL"
+        Delta1 = parameters["Delta1"]
+        Delta2 = parameters["Delta2"]
+        eta = parameters["eta"]
+        
     end
 
     for i = 1:1:N
