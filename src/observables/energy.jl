@@ -119,13 +119,13 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
         energie = real(J1*ener_link + J2*expect_obs1 - hz*expect_obs5)/(N)
     elseif model=="Tb_SSL"
         if H_dir=="001"
-            h_ren=2*1.28
+            h_ren=2*1.28*hz
             energie = real(J1*ener_link + J2*expect_obs1 - h_ren*expect_obs2)/(N)
         elseif H_dir=="100"
-            h_ren=2*6.32
+            h_ren=2*6.32*hz
             energie = real(J1*ener_link + J2*expect_obs1 - h_ren*expect_obs5)/(N)
         elseif H_dir=="110"
-            h_ren=2*8.93
+            h_ren=2*8.93*hz
             energie =real(J1*ener_link + J2*expect_obs1 - h_ren*expect_obs5)/(N)
         end
     else
