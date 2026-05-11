@@ -46,18 +46,19 @@ Jy=${Jy:-0.50}
 Jz=${Jz:-1.00}
 Delta1=${Delta1:-1.0}
 Delta2=${Delta2:-0.5}
-model=${model:-XYZ_stagH}
+eta=${eta:-0.0}
+H_dir=${H_dir:-100}
+model=${model:-Tb_SSL}
 
-H_norm=$(echo "scale=3;$hmin + ($hmax-$hmin)*($SLURM_ARRAY_TASK_ID-1)/($SLURM_ARRAY_TASK_COUNT-1)" | bc -l)
-hz=$(echo "scale=3;$H_norm*2*6.32 " | bc -l)
+hz=$(echo "scale=3;$hmin + ($hmax-$hmin)*($SLURM_ARRAY_TASK_ID-1)/($SLURM_ARRAY_TASK_COUNT-1)" | bc -l)
 echo "D=$D"
 echo "multiD=$multiD"
 
 for curD in $(seq $D 1 $(echo "$D+$multiD"|bc)); do
     echo "Running with parameters:"
     echo "D=$curD J1=$J1 J2=$J2 Delta=$Delta hx=$hx hz=$hz N=$N"
-    echo "Jx=$Jx Jy=$Jy Jz=$Jz Delta1=$Delta1 Delta2=$Delta2 model=$model"
-    julia --project=. -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$Delta1" "$Delta2" "$model"
+    echo "Jx=$Jx Jy=$Jy Jz=$Jz Delta1=$Delta1 Delta2=$Delta2 eta=$eta H_dir=$H_dir model=$model"
+    julia --project=. -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$Delta1" "$Delta2" "$eta" "$H_dir" "$model"
     mkdir -p $RES
     cp $SCR/$SLURM_JOB_ID/Results/* $RES
 done

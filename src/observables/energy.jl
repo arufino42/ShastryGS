@@ -37,7 +37,7 @@ function energy(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,physical_legs,param
         Jy = parameters["Jy"]
         Jz = parameters["Jz"]
         obs1 = Jz*kron(sz,sz) + Jx*kron(sx,sx) + Jy*kron(sy,sy) 
-    elseif model=="XYZ_stagH"
+    elseif model=="XYZ_stagH"|| model=="Tb_SSL"
         Delta2 = parameters["Delta2"]
         obs1 = kron(sz,sz) + Delta2 * ( kron(sx,sx) + kron(sy,sy) ) 
     end
