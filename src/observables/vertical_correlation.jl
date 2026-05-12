@@ -23,13 +23,13 @@ function vertical_correlation(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,
         Delta = parameters["Delta"]
 
         if mod(i+j,2) == 0 # pair -> up # 14 24
-            ss_xyz = Delta*(kron(kron(sx,id),kron(id,sx)) + kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz)) + 
-                    Delta*(kron(kron(id,sx),kron(id,sx)) + kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))
+            ss_xyz = Delta*(kron(kron(sx,id),kron(id,sx)) + kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz)) + eta*(kron(kron(sx,id),kron(id,sy)) + kron(kron(sy,id),kron(id,sx))) +
+            Delta*(kron(kron(id,sx),kron(id,sx)) + kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz)) - eta*(kron(kron(id,sx),kron(id,sy)) + kron(kron(id,sy),kron(id,sx))) 
         end
 
         if mod(i+j,2) == 1 # impair -> down
-            ss_xyz = Delta*(kron(kron(sx,id),kron(sx,id)) + kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id)) + 
-                    Delta*(kron(kron(sx,id),kron(id,sx)) + kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))
+            ss_xyz = Delta*(kron(kron(sx,id),kron(sx,id)) + kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id)) - eta*(kron(kron(sx,id),kron(sy,id)) + kron(kron(sy,id),kron(sx,id)))+
+            Delta*(kron(kron(sx,id),kron(id,sx)) + kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz)) + eta*(kron(kron(sx,id),kron(id,sy)) + kron(kron(sy,id),kron(id,sx)))
         end
         
     elseif model=="XYZ"
@@ -61,15 +61,15 @@ function vertical_correlation(C,T,tens_a,tens_A,gt::Matrix{Symbol},cxd,cyd,
         end
     elseif model=="Tb_SSL"
         Delta = parameters["Delta1"]
-
+        eta = parameters["eta"]
         if mod(i+j,2) == 0 # pair -> up # 14 24
-            ss_xyz = Delta*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz)) + 
-                    Delta*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))
+            ss_xyz = Delta*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz)) + eta*(kron(kron(sx,id),kron(id,sy)) + kron(kron(sy,id),kron(id,sx))) +
+            Delta*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz)) - eta*(kron(kron(id,sx),kron(id,sy)) + kron(kron(id,sy),kron(id,sx))) 
         end
 
         if mod(i+j,2) == 1 # impair -> down
-            ss_xyz = Delta*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id)) + 
-                    Delta*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))
+            ss_xyz = Delta*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id)) - eta*(kron(kron(sx,id),kron(sy,id)) + kron(kron(sy,id),kron(sx,id))) + 
+            Delta*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz)) + eta*(kron(kron(sx,id),kron(id,sy)) + kron(kron(sy,id),kron(id,sx)))
         end
     end
     # ss_xyz = reshape(ss_xyz,(4,4,4,4))

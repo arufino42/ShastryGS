@@ -50,7 +50,7 @@ eta=${eta:-0.0}
 H_dir=${H_dir:-100}
 model=${model:-Tb_SSL}
 
-hz=$(echo "scale=3;$hmin + ($hmax-$hmin)*($SLURM_ARRAY_TASK_ID-1)/($SLURM_ARRAY_TASK_COUNT-1)" | bc -l)
+hz=$(echo "scale=7;$hmin + ($hmax-$hmin)*($SLURM_ARRAY_TASK_ID-1)/($SLURM_ARRAY_TASK_COUNT-1)" | bc -l)
 echo "D=$D"
 echo "multiD=$multiD"
 

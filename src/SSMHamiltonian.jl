@@ -145,25 +145,26 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
             gin_even = reshape(e2 ,(4, 4)); 
             gin_odd = reshape(e2 ,(4, 4)); 
         end
-        h1 = J1*( Delta1*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id))) + 
-            J1*( Delta1*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id))) 
+        # In order to add a bond dependent off-diagonal interaction eta, modify gu,gr,gd,gl
+        h1 = J1*( Delta1*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id)) + eta*(kron(kron(sx,id),kron(sy,id)) + kron(kron(sy,id),kron(sx,id))) ) + 
+            J1*( Delta1*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id))  - eta*(kron(kron(id,sx),kron(sy,id)) + kron(kron(id,sy),kron(sx,id))) ) 
         e1 = exp(-h1/nsu);
-        gr = reshape(e1, (4,4,4,4));  # 21 43 21 43
+        gr = reshape(e1, (4,4,4,4));  # 11 21
 
-        h2 = J1*(Delta1*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id))) + 
-            J1*(Delta1*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))) 
+        h2 = J1*(Delta1*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id))  - eta*(kron(kron(id,sx),kron(sy,id)) + kron(kron(id,sy),kron(sx,id))) ) + 
+            J1*(Delta1*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))   + eta*(kron(kron(id,sx),kron(id,sy)) + kron(kron(id,sy),kron(id,sx))) ) 
         e2 = exp(-h2/nsu);
-        gl = reshape(e2, (4,4,4,4)); # 21 43 21 43
+        gl = reshape(e2, (4,4,4,4)); # 21 22
     
-        h3 = J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))) + 
-            J1*(Delta1*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))) 
+        h3 = J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))  + eta*(kron(kron(sx,id),kron(id,sy)) + kron(kron(sy,id),kron(id,sx)))  ) + 
+            J1*(Delta1*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz))   - eta*(kron(kron(id,sx),kron(id,sy)) + kron(kron(id,sy),kron(id,sx)))  ) 
         e3 = exp(-h3/nsu);
-        gu = reshape(e3, (4,4,4,4)); # 21 43 21 43
+        gu = reshape(e3, (4,4,4,4)); # 12 22
 
-        h4 = J1*(Delta1*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id))) + 
-            J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))) 
+        h4 = J1*(Delta1*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id))  - eta*(kron(kron(sx,id),kron(sy,id)) + kron(kron(sy,id),kron(sx,id)))  ) + 
+            J1*(Delta1*(kron(kron(sx,id),kron(id,sx)) - kron(kron(sy,id),kron(id,sy))) + kron(kron(sz,id),kron(id,sz))   + eta*(kron(kron(sx,id),kron(id,sy)) + kron(kron(sy,id),kron(id,sx)))  ) 
         e4 = exp(-h4/nsu);
-        gd = reshape(e4, (4,4,4,4)); # 21 43 21 43
+        gd = reshape(e4, (4,4,4,4)); # 11 12
         
     end
     for i = 1:1:N
@@ -242,7 +243,6 @@ function SSMHamiltonian(gt::Matrix{Symbol},physical_legs,nsu::Float64,parameters
 
         end
     end
-
     return gx, gy, mu
 
 end

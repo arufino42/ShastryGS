@@ -50,14 +50,15 @@ function horizontal_correlation(C,T,tens_a,tens_A,gt,cx,cy,
         end
     elseif model=="Tb_SSL"
         Delta=parameters["Delta1"]
+        eta=parameters["eta"]
         if abs(mod(i+j,2) - 0) < 1e-9 #pair
-            ss_xyz = Delta*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id)) + 
-            Delta*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id)) 
+            ss_xyz = Delta*(kron(kron(sx,id),kron(sx,id)) - kron(kron(sy,id),kron(sy,id))) + kron(kron(sz,id),kron(sz,id))+ eta*(kron(kron(sx,id),kron(sy,id)) + kron(kron(sy,id),kron(sx,id))) +
+            Delta*(kron(kron(id,sx),kron(sx,id)) - kron(kron(id,sy),kron(sy,id))) + kron(kron(id,sz),kron(sz,id)) - eta*(kron(kron(id,sx),kron(sy,id)) + kron(kron(id,sy),kron(sx,id)))
         end
 
         if abs(mod(i+j,2) - 1) < 1e-9 # impair
-            ss_xyz = Delta*(kron(kron(id,sx),kron(sx,id)) -  kron(kron(id,sy),kron(sy,id))) +  kron(kron(id,sz),kron(sz,id)) +
-            Delta*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz));
+            ss_xyz = Delta*(kron(kron(id,sx),kron(sx,id)) -  kron(kron(id,sy),kron(sy,id))) +  kron(kron(id,sz),kron(sz,id)) - eta*(kron(kron(id,sx),kron(sy,id)) + kron(kron(id,sy),kron(sx,id))) +
+            Delta*(kron(kron(id,sx),kron(id,sx)) - kron(kron(id,sy),kron(id,sy))) + kron(kron(id,sz),kron(id,sz)) + eta*(kron(kron(id,sx),kron(id,sy)) + kron(kron(id,sy),kron(id,sx)));
         end
     end
 

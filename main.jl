@@ -37,13 +37,13 @@ let
         J2::Float64 = -10.6;
         Delta::Float64 = -0.25;
         hx::Float64 = 0.0;
-        hz::Float64= 0.5;
+        hz::Float64= 0.4;
         Jx::Float64= 1.4;
         Jy::Float64= 0.6;
         Jz::Float64= 0.;
-        Delta1::Float64= 1.0;
-        Delta2::Float64= 0.5;
-        eta=0.0;
+        Delta1::Float64= 0.5;
+        Delta2::Float64= 1.0;
+        eta=1.8;
         H_dir="110";
         model::String="Tb_SSL"
     end
