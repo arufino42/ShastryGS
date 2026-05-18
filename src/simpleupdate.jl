@@ -35,7 +35,7 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
     itctm = 0
     errctm = 0
     n_non_conv=0
-    while ener < enertmp && abs(ener - enertmp)/dbetasu/modit > 1e-6/0.1/300 && n_non_conv<10
+    while ener < enertmp && abs(ener - enertmp)> 1e-6 && n_non_conv<10
 
         iter = iter + 1
         Gamma,lambdax,lambday,free_energy = simpleupdateJ1(Gamma,lambdax,lambday,physical_legs,gt,nsu,parameters,free_energy)
@@ -48,7 +48,7 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
         if mod(iter,modit) == 0
             if model=="XY"
 
-                file_name_jld2 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Delta D hz hx
+                file_name_jld2 = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.5f_J2=%.5f_Delta=%.5f_D=%.0f_hz=%.5f_hx=%.5f.jld2" parameters["folder"] N J1 J2 Delta D hz hx
                 save(file_name_jld2,
                         "D",D,
                         "Delta",delta,
@@ -69,7 +69,7 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
                 Jx = parameters["Jx"]
                 Jy = parameters["Jy"]
                 Jz = parameters["Jz"]
-                file_name_jld2 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f_model=%s.jld2" N J1 J2 Jx Jy Jz D hz hx model
+                file_name_jld2 = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.5f_J2=%.5f_Jx=%.5f_Jy=%.5f_Jz=%.5f_D=%.0f_hz=%.5f_hx=%.5f_model=%s.jld2" parameters["folder"] N J1 J2 Jx Jy Jz D hz hx model
                 save(file_name_jld2,
                         "D",D,
                         "Delta",delta,
@@ -88,7 +88,7 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
             elseif model=="XYZ_stagH"
                 Delta1=parameters["Delta1"]
                 Delta2=parameters["Delta2"]
-                file_name_jld2 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 D hz model
+                file_name_jld2 = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.5f_J2=%.5f_Delta1=%.5f_Delta2=%.5f_D=%.0f_hz=%.5f_model=%s.jld2" parameters["folder"] N J1 J2 Delta1 Delta2 D hz model
                 save(file_name_jld2,
                         "D",D,
                         "Delta1",Delta1,
@@ -109,7 +109,7 @@ function simpleupdate(dbetasu::Float64,parameters::Dict,modit::Int64)
                 Delta2=parameters["Delta2"]
                 eta=parameters["eta"]
                 H_dir=parameters["H_dir"]
-                file_name_jld2 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 eta H_dir D hz model
+                file_name_jld2 = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.5f_J2=%.5f_Delta1=%.5f_Delta2=%.5f_eta=%.5f_H_dir=%s_D=%.0f_hz=%.5f_model=%s.jld2" parameters["folder"] N J1 J2 Delta1 Delta2 eta H_dir D hz model
                 save(file_name_jld2,
                         "D",D,
                         "Delta1",Delta1,
@@ -221,7 +221,7 @@ function SU(parameters)
 
     if model == "XY"
         Delta = parameters["Delta"]
-        file_name_mat = @sprintf "Results/Results_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Delta D hz hx
+        file_name_mat = @sprintf "%sResults/Results_N=%.0f_J1=%.5f_J2=%.5f_Delta=%.5f_D=%.0f_hz=%.5f_hx=%.5f.jld2" parameters["folder"] N J1 J2 Delta D hz hx
         file = save(file_name_mat, 
          "J1", J1,
          "J2", J2,
@@ -243,7 +243,7 @@ function SU(parameters)
         Jx = parameters["Jx"]
         Jy = parameters["Jy"]
         Jz = parameters["Jz"]
-        file_name_mat = @sprintf "Results/Results_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f_model=%s.jld2" N J1 J2 Jx Jy Jz D hz hx model
+        file_name_mat = @sprintf "%sResults/Results_N=%.0f_J1=%.5f_J2=%.5f_Jx=%.5f_Jy=%.5f_Jz=%.5f_D=%.0f_hz=%.5f_hx=%.5f_model=%s.jld2" parameters["folder"] N J1 J2 Jx Jy Jz D hz hx model
         file = save(file_name_mat,
          "J1", J1,
          "J2", J2,
@@ -267,7 +267,7 @@ function SU(parameters)
     elseif model=="XYZ_stagH"
         Delta1 = parameters["Delta1"]
         Delta2 = parameters["Delta2"]
-        file_name_mat = @sprintf "Results/Results_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 D hz model
+        file_name_mat = @sprintf "%sResults/Results_N=%.0f_J1=%.5f_J2=%.5f_Delta1=%.5f_Delta2=%.5f_D=%.0f_hz=%.5f_model=%s.jld2" parameters["folder"] N J1 J2 Delta1 Delta2 D hz model
         file = save(file_name_mat,
          "J1", J1,
          "J2", J2,
@@ -292,7 +292,7 @@ function SU(parameters)
         Delta2 = parameters["Delta2"]
         eta = parameters["eta"]
         H_dir = parameters["H_dir"]
-        file_name_mat = @sprintf "Results/Results_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 eta H_dir D hz model
+        file_name_mat = @sprintf "%sResults/Results_N=%.0f_J1=%.5f_J2=%.5f_Delta1=%.5f_Delta2=%.5f_eta=%.5f_H_dir=%s_D=%.0f_hz=%.5f_model=%s.jld2" parameters["folder"] N J1 J2 Delta1 Delta2 eta H_dir D hz model
         file = save(file_name_mat,
          "J1", J1,
          "J2", J2,

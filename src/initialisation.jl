@@ -73,26 +73,31 @@ function initialisation(parameters::Dict)
     model = parameters["model"]
     
     if model=="XY"
-        file_name_jld2_D = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Delta D hz hx
-        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" N J1 J2 Delta D-1 hz hx
+        file_name_jld2_D = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" parameters["folder"] N J1 J2 Delta D hz hx
+        file_name_jld2_Dm1 = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta=%.2f_D=%.0f_hz=%.2f_hx=%.2f.jld2" parameters["folder"] N J1 J2 Delta D-1 hz hx
     elseif model=="XYZ"
         Jx = parameters["Jx"]
         Jy = parameters["Jy"]
         Jz = parameters["Jz"]
-        file_name_jld2_D = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f_model=%s.jld2" N J1 J2 Jx Jy Jz D hz hx model
-        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f_model=%s.jld2" N J1 J2 Jx Jy Jz D-1 hz hx model
+        file_name_jld2_D = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f_model=%s.jld2" parameters["folder"] N J1 J2 Jx Jy Jz D hz hx model
+        file_name_jld2_Dm1 = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Jx=%.2f_Jy=%.2f_Jz=%.2f_D=%.0f_hz=%.2f_hx=%.2f_model=%s.jld2" parameters["folder"] N J1 J2 Jx Jy Jz D-1 hz hx model
     elseif model=="XYZ_stagH"
         Delta1 = parameters["Delta1"]
         Delta2 = parameters["Delta2"]
-        file_name_jld2_D = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 D hz model
-        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 D-1 hz model
+        file_name_jld2_D = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" parameters["folder"] N J1 J2 Delta1 Delta2 D hz model
+        file_name_jld2_Dm1 = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_D=%.0f_hz=%.2f_model=%s.jld2" parameters["folder"] N J1 J2 Delta1 Delta2 D-1 hz model
     elseif model=="Tb_SSL"
         Delta1 = parameters["Delta1"]
         Delta2 = parameters["Delta2"]
         eta = parameters["eta"]
         H_dir = parameters["H_dir"]
-        file_name_jld2_D = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 eta H_dir D hz model
-        file_name_jld2_Dm1 = @sprintf "Results/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" N J1 J2 Delta1 Delta2 eta H_dir D-1 hz model
+        file_name_jld2_D = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" parameters["folder"] N J1 J2 Delta1 Delta2 eta H_dir D hz model
+        @show file_name_jld2_D
+        # @show ls(file_name_jld2_D)
+        file_name_jld2_Dm1 = @sprintf "%sResults/LocalTensors_N=%.0f_J1=%.2f_J2=%.2f_Delta1=%.2f_Delta2=%.2f_eta=%.2f_H_dir=%s_D=%.0f_hz=%.2f_model=%s.jld2" parameters["folder"] N J1 J2 Delta1 Delta2 eta H_dir D-1 hz model
+        @show file_name_jld2_Dm1
+        
+        # @show ls(file_name_jld2_Dm1)
     else
         error("please choose a valid model, either XY, XYZ, XYZ_stagH or Tb_SSL.")
     end
@@ -109,7 +114,7 @@ function initialisation(parameters::Dict)
         Gamma,lambdax,lambday,physical_legs,gt,gg = load(file_name_jld2_Dm1,"Gamma","lambdax","lambday","physical_legs","gt","gg")
 
     else
-
+        # error("Loading failed")
         tt = lattice(N)
         gg = tt.gg;
         gt = tt.gt;

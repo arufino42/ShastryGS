@@ -5,24 +5,13 @@
 #SBATCH --nodes 1
 #SBATCH --ntasks 1
 #SBATCH --cpus-per-task 1
-#SBATCH --time 04:00:00
+#SBATCH --time 08:00:00
 #SBATCH --mem 6G
 #SBATCH --output=logs/%A_%a.out
 #SBATCH --error=logs/%A_%a.err
 #SBATCH --array=1-201
 
-
-export SCR=/scratch/afdossan
-export DAT=/home/afdossan/Samuel_SSL_IPEPS
-export RES=/home/afdossan/Samuel_SSL_IPEPS/Results
-
 echo "***** START OF JOB ***** "
-
-cd $SCR
-mkdir $SLURM_JOB_ID
-cd ./$SLURM_JOB_ID
-
-cp -a $DAT/. .
 
 module purge
 module load gcc julia
@@ -44,9 +33,9 @@ N=${N:-6}
 Jx=${Jx:-0.25}
 Jy=${Jy:-0.50}
 Jz=${Jz:-1.00}
-Delta1=${Delta1:-1.0}
-Delta2=${Delta2:-0.5}
-eta=${eta:-0.0}
+Delta1=${Delta1:-0.5}
+Delta2=${Delta2:-1.0}
+eta=${eta:-0.8}
 H_dir=${H_dir:-100}
 model=${model:-Tb_SSL}
 
@@ -59,11 +48,8 @@ for curD in $(seq $D 1 $(echo "$D+$multiD"|bc)); do
     echo "D=$curD J1=$J1 J2=$J2 Delta=$Delta hx=$hx hz=$hz N=$N"
     echo "Jx=$Jx Jy=$Jy Jz=$Jz Delta1=$Delta1 Delta2=$Delta2 eta=$eta H_dir=$H_dir model=$model"
     julia --project=. -t 1 main.jl "$curD" "$J1" "$J2" "$Delta" "$hx" "$hz" "$N" "$Jx" "$Jy" "$Jz" "$Delta1" "$Delta2" "$eta" "$H_dir" "$model"
-    mkdir -p $RES
-    cp $SCR/$SLURM_JOB_ID/Results/* $RES
 done
 
 echo FINISHED at `date`
 
 echo " ***** END OF JOB ***** "
-
